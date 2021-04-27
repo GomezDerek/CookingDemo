@@ -87,10 +87,14 @@ class Play extends Phaser.Scene {
             && this.actionBox.x < this.superZone.getRightCenter().x) 
         {
             console.log("You hit the super zone!");
-            this.superZoneHit = true;
+            //this.superZoneHit = true;
             if(this.progress.width < this.progressBar.width - 6) {
-                //this.progress.width += 10;
+                this.progress.width += 10;
             }
+            this.progress.setFillStyle(0xFFFFFF, 1);
+        }
+        else {
+            this.progress.setFillStyle(0x00FF00, 1);
         }
 
         //restart progress bar
@@ -100,7 +104,7 @@ class Play extends Phaser.Scene {
             this.progress.setFillStyle(0x00FF00, 1);
             console.log("backspace pressed");
         }
-
+/*
         if(this.superZoneHit) {
             this.speed = 0;
             //this.switchProgressColor();
@@ -109,6 +113,8 @@ class Play extends Phaser.Scene {
         else {
             this.speed = this.SPEED;
         }
+*/
+
 
         //control needle (actionBox) with the space bar
         if( SPACEBAR.isDown ) {
@@ -195,8 +201,16 @@ class Play extends Phaser.Scene {
        }
 
         //this.sweetSpot.x += shift;
-        if(!this.superZoneHit){
-            this.SPEED = this.speed;
+        if(this.progress.width < this.progressBar.width - 7){
+            if(this.speed == 0) {
+                this.speed = this.SPEED;
+            }
+            else { 
+                this.SPEED = this.speed;
+            }
+        }
+        else {
+            this.speed = 0;
         }
     }
 
