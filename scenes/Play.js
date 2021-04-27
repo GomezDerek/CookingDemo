@@ -2,9 +2,12 @@ class Play extends Phaser.Scene {
     constructor() {
         super("gameScene");
 
+        this.SPEED = 4;
         this.speed = 4;
         this.target = CENTER_X;
         this.direction = -1;
+
+        this.superZoneHit = false;
     }
 
     preload() {
@@ -22,6 +25,14 @@ class Play extends Phaser.Scene {
         RIGHTKEY = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         ENTER = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
+
+        this.colors = [
+            0xFFCC00,
+            0Xff66b3,
+            0x00FF00,
+            0X990000,
+            0X000099
+        ];
 
         //background
         var bgColor = new Phaser.Display.Color(0 , 0, 0);
@@ -58,12 +69,46 @@ class Play extends Phaser.Scene {
         this.progress.setOrigin(0, .5);
         this.progress.setFillStyle(0x00FF00, 1);
 
+        this.superZone = this.add.rectangle(this.sweetSpot.x, this.sweetSpot.y, 10, 40, 0xFFCC00);
+        //this.superZone.setStrokeStyle(3, 0XFFCC00, 1);
+
         this.speedText = this.add.text(50, SCREEN_HEIGHT - 100, "Press UP or DOWN to adjust speed!\nSpeed: " + this.speed, {font: "20px Arial"});
+        this.resetInstructions = this.add.text(SCREEN_WIDTH*3/4, SCREEN_HEIGHT - 100, "Press BACKSPACE to \nreset progress", {font: "20px Arial"});
     }
     
     update() {
         //this.input();
+        console.log(this.progress);
+        //superZone follows the sweetSpot
+        this.superZone.x = this.sweetSpot.x + this.sweetSpot.width/2;
 
+        if(ENTER.isDown 
+            && this.actionBox.x > this.superZone.getLeftCenter().x
+            && this.actionBox.x < this.superZone.getRightCenter().x) 
+        {
+            console.log("You hit the super zone!");
+            this.superZoneHit = true;
+            if(this.progress.width < this.progressBar.width - 6) {
+                //this.progress.width += 10;
+            }
+        }
+
+        //restart progress bar
+        if (Phaser.Input.Keyboard.JustDown(BACKSPACE) || BACKSPACE.isDown) {
+            this.progress.width = 5;
+            this.superZoneHit = false;
+            this.progress.setFillStyle(0x00FF00, 1);
+            console.log("backspace pressed");
+        }
+
+        if(this.superZoneHit) {
+            this.speed = 0;
+            //this.switchProgressColor();
+            this.progress.width += 5;
+        }
+        else {
+            this.speed = this.SPEED;
+        }
 
         //control needle (actionBox) with the space bar
         if( SPACEBAR.isDown ) {
@@ -88,7 +133,7 @@ class Play extends Phaser.Scene {
 
         //fill up the progress bar if cooking 
         if(this.actionBox.x < this.sweetSpot.getRightCenter().x && this.actionBox.x > this.sweetSpot.getLeftCenter().x && this.progress.width < this.progressBar.width - 6) {
-            this.progress.width += 1;
+            this.progress.width += .25;
         } 
 
 
@@ -150,6 +195,9 @@ class Play extends Phaser.Scene {
        }
 
         //this.sweetSpot.x += shift;
+        if(!this.superZoneHit){
+            this.SPEED = this.speed;
+        }
     }
 
     shift() {
@@ -160,5 +208,43 @@ class Play extends Phaser.Scene {
         //this.direction = sign;
         return shift;
     }
+
+    switchProgressColor() {
+        console.log("switching colors!");
+        let current = this.progress.fillColor;
+        let nu = this.progress.fillColor;
+        console.log("current =" + this.progress.fill);
+        // while(current == nu) {
+            nu = this.colors[ Math.random(this.colors.length) | 0 ];
+        // }
+        console.log("new = " + nu);
+        this.progress.setFillStyle(nu, 1);
+    }
+
+
         
 }
+
+
+// activities
+
+// toss salad/ingredients
+// stir/mix ingredients
+// change heat
+// chop food
+
+// grill fish
+    // start fire
+    // rotate skewer
+    // skewer fish
+
+// salad
+    // chop fruits/veggies
+    // add ingredients to bowl
+    // wash ingredients
+
+// soup
+    // start fire
+    // boil water
+    // add ingredients to pot
+    // stir pot
